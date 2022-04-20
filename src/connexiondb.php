@@ -2,9 +2,9 @@
 // Déclaration d'une nouvelle classe
     class connexiondb {
         private $host = 'localhost'; 
-        private $name = 'db_test';
+        private $name = 'mysql';
         private $user = 'root';
-        private $pass = 'root';
+        private $pass = 'rootroot';
         private $connexion;
     
  

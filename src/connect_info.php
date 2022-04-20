@@ -1,10 +1,10 @@
 <?php
 include_once ('connexiondb.php');
-
+$valid = (boolean) true;
 
 if (! empty($_POST)) {
     extract($_POST);
-    $valid = (boolean) true;
+    
 
     if (isset($_POST['connexion'])) {
 
@@ -28,10 +28,10 @@ if (! empty($_POST)) {
 <!DOCTYPE html>
 <html>
 <body>
-	<form action="" method="post">
+	<form action="" method="post" type="hidden">
 
 		<div class="form-group">
-			<label for="email">Email</label> <input type="text"
+			<label for="email">Email</label><input type="text"
 				class="form-control" id="email" name="email" />
 				<?php
     if (isset($err_msg3)) {
@@ -57,33 +57,42 @@ if (! empty($_POST)) {
 	</form>
 	
 <?php 
+
 if ($valid) {
     
-    //echo $email . $password;
-    //avec objet PDO: https://www.chiny.me/objet-pdo-pour-la-connexion-a-une-base-de-donnees-en-php-8-12.php
-    $ins = $DB->prepare("SELECT * FROM registration");
-    $ins->setFetchMode(PDO::FETCH_ASSOC);
-    //$ins->execute(array($email,$password));
-    $ins->execute();
     
-    $tab = $ins->fetchAll();
-    echo $tab;
     
-    //$result = mysql_query("SELECT * FROM registration WHERE email='%s' AND password='%s' ", mysql_real_escape_string($email), mysql_real_escape_string($password));
-    //echo $result;
-    // $nblignes = mysql_num_rows($result);
-    // $req = mysqli_query($BDD, "SELECT * FROM registration WHERE email=? AND password=?");
-    // $result = ->execute(array($email,$password));
-    // $req = $req->fetch();
     
-    //while ($ligne = mysql_fetch_array($result)) {
-    //    $infos .= "<div>" . $ligne['firstName'] . "</div><div>" . $ligne['lastName'] . "</div><div>" . $ligne['email'] . "</div><div>" . $ligne['password'] . "</div><div>" . $ligne['number'];
-    //}
+    // connect to the database and select the publisher
+    
+    
+    $sql = 'SELECT *
+		FROM registration
+        WHERE email = ? AND password = ?';
+    
+    $statement = $BDD->prepare($sql);
+    $statement->bindParam(1, $email, PDO::PARAM_STR);
+    $statement->bindParam(2, $password, PDO::PARAM_STR);
+    $statement->execute();
+    
+    $data_retrieve = $statement->fetch(PDO::FETCH_ASSOC);
+    
+    if ($data_retrieve) {
+        
+        echo '<h2> INFORMATIONS PERSONELLES DU COMPTE</h2><br>';
+        echo 'Prenom: ' . $data_retrieve['firstName'] . '<br>Nom: ' . $data_retrieve['lastName'] . '<br>Email: ' . $data_retrieve['email'] . '<br>Mot de passe: ';
+        for ($i = 0; $i < strlen($data_retrieve['password']); $i++) {
+            echo '•';
+        }
+        echo '<br>Numéro de téléphone: ' . $data_retrieve['number'];
+    } else {
+        if($email)
+        echo "le compte de $email n'a pas été trouvé !";
+    }
     
 } else {
     $valid = false;
-    $err_compte = "ce compte n'existe pas!";
-    echo $err_compte;
+    die();
 }
 ?>
   
